@@ -24,6 +24,10 @@ import WordCard from '../word/WordCard.vue'
 import { useTyping } from '../../composables/useTyping'
 import { useSound } from '../../composables/useSound'
 import { useAnimation } from '../../composables/useAnimation'
+import { errorHandler } from '../../utils/errorHandler'
+
+// 提取正则表达式为常量
+const VALID_CHAR_REGEX = /^[a-zA-Z\-']$/
 
 const store = useWordStore()
 const areaRef = ref(null)
@@ -37,7 +41,11 @@ watch(
   () => store.currentWord,
   (newWord) => {
     if (newWord?.name) {
-      speakWord(newWord.name)
+      try {
+        speakWord(newWord.name)
+      } catch (error) {
+        errorHandler.handleAudioError(error)
+      }
     }
   },
   { immediate: true }
@@ -47,19 +55,24 @@ const handleKeydown = (event) => {
   if (event.ctrlKey || event.altKey || event.metaKey) return
   
   if (event.key.length === 1) {
-    if (/^[a-zA-Z\-']$/.test(event.key)) {
+    if (VALID_CHAR_REGEX.test(event.key)) {
       const inputChar = event.key.toLowerCase()
-      const correctChar = store.currentWord.name[inputState.value.length]?.toLowerCase()
+      const currentLength = inputState.value.length
+      const correctChar = store.currentWord.name[currentLength]?.toLowerCase()
       
       if (correctChar) {
         handleInput(inputChar)
-        store.typedChars[inputState.value.length - 1] = inputChar
+        store.typedChars[currentLength] = inputChar
 
         if (inputChar === correctChar) {
-          playKeySound()
+          try {
+            playKeySound()
+          } catch (error) {
+            errorHandler.handleAudioError(error)
+          }
           const chars = wordCardRef.value?.chars
-          if (chars && chars[inputState.value.length - 1]) {
-            jump(chars[inputState.value.length - 1])
+          if (chars && chars[currentLength]) {
+            jump(chars[currentLength])
           }
 
           if (inputState.value === store.currentWord.name) {
@@ -69,17 +82,27 @@ const handleKeydown = (event) => {
             }, 300)
           }
         } else {
-          playErrorSound()
-          if (wordCardRef.value?.chars[inputState.value.length - 1]) {
-            shake(wordCardRef.value.chars[inputState.value.length - 1])
+          try {
+            playErrorSound()
+          } catch (error) {
+            errorHandler.handleAudioError(error)
           }
-          store.increaseErrors()
+          if (wordCardRef.value?.chars[currentLength]) {
+            shake(wordCardRef.value.chars[currentLength])
+          }
+          if (typeof store.increaseErrors === 'function') {
+            store.increaseErrors()
+          }
         }
       }
     }
   } else if (event.key === 'Backspace') {
     if (inputState.value.length > 0) {
-      playKeySound()
+      try {
+        playKeySound()
+      } catch (error) {
+        errorHandler.handleAudioError(error)
+      }
       handleBackspace()
       store.typedChars.pop()
     }

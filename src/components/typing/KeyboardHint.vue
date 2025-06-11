@@ -17,7 +17,8 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch } from 'vue';
+import { KEYBOARD_LAYOUT } from '@/constants/keyboardLayout'; // 假设提取到常量文件
 
 const props = defineProps({
   currentWord: {
@@ -28,33 +29,31 @@ const props = defineProps({
     type: Number,
     default: 0
   }
-})
+});
 
-const keyboardLayout = [
-  ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
-  ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-  ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
-]
+const keyboardLayout = KEYBOARD_LAYOUT;
+const activeKey = ref('');
+const errorKey = ref('');
 
-const activeKey = ref('')
-const errorKey = ref('')
-
-watch(() => props.currentWord?.name, (newWord) => {
-  if (newWord) {
-    activeKey.value = newWord[props.currentIndex]?.toLowerCase() || ''
-    errorKey.value = ''
+const updateActiveKey = () => {
+  const currentWord = props.currentWord;
+  if (currentWord && currentWord.name) {
+    activeKey.value = currentWord.name[props.currentIndex]?.toLowerCase() || '';
+    errorKey.value = '';
   }
-})
+};
+
+watch(() => props.currentWord?.name, updateActiveKey, { immediate: true });
 
 // 提供方法给父组件调用
 const markError = (key) => {
-  errorKey.value = key.toLowerCase()
+  errorKey.value = key.toLowerCase();
   setTimeout(() => {
-    errorKey.value = ''
-  }, 500)
-}
+    errorKey.value = '';
+  }, 500);
+};
 
-defineExpose({ markError })
+defineExpose({ markError });
 </script>
 
 <style scoped>
