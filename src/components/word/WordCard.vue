@@ -124,7 +124,7 @@ defineExpose({
 .word-display {
   @apply flex flex-col items-center justify-start text-center
          h-[calc(100vh-300px)];
-  padding-top: 3rem; /* 你可以调整这个值来达到理想的位置 */
+  padding-top: 5rem; /* 你可以调整这个值来达到理想的位置 */
 }
 .word {
   @apply text-[120px] font-mono tracking-wider text-white cursor-pointer
