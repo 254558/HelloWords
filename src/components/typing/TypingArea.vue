@@ -46,57 +46,77 @@ watch(
       } catch (error) {
         errorHandler.handleAudioError(error)
       }
+      
+      // 重置输入状态
+      reset()
+      store.typedChars = []
     }
   },
   { immediate: true }
 )
 
+// 监听输入状态变化，同步到 store
+watch(inputState, (newValue) => {
+  // 确保 store.typedChars 与 inputState 同步
+  store.typedChars = newValue.split('')
+})
+
+// 处理键盘输入
 const handleKeydown = (event) => {
+  // 忽略修饰键组合
   if (event.ctrlKey || event.altKey || event.metaKey) return
   
+  const currentLength = inputState.value.length
+  const correctChar = store.currentWord.name[currentLength]?.toLowerCase()
+  
   if (event.key.length === 1) {
+    // 处理字母输入
     if (VALID_CHAR_REGEX.test(event.key)) {
       const inputChar = event.key.toLowerCase()
-      const currentLength = inputState.value.length
-      const correctChar = store.currentWord.name[currentLength]?.toLowerCase()
       
       if (correctChar) {
         handleInput(inputChar)
-        store.typedChars[currentLength] = inputChar
-
+        
         if (inputChar === correctChar) {
+          // 正确输入
           try {
             playKeySound()
           } catch (error) {
             errorHandler.handleAudioError(error)
           }
+          
           const chars = wordCardRef.value?.chars
           if (chars && chars[currentLength]) {
             jump(chars[currentLength])
           }
-
+          
           if (inputState.value === store.currentWord.name) {
+            // 完成单词
             setTimeout(() => {
               reset()
+              store.typedChars = []
               store.nextWord()
             }, 300)
           }
         } else {
+          // 错误输入
           try {
             playErrorSound()
           } catch (error) {
             errorHandler.handleAudioError(error)
           }
-          if (wordCardRef.value?.chars[currentLength]) {
-            shake(wordCardRef.value.chars[currentLength])
+          
+          const chars = wordCardRef.value?.chars
+          if (chars && chars[currentLength]) {
+            shake(chars[currentLength])
           }
-          if (typeof store.increaseErrors === 'function') {
-            store.increaseErrors()
-          }
+          
+          store.increaseErrors?.()
         }
       }
     }
   } else if (event.key === 'Backspace') {
+    // 处理退格键
     if (inputState.value.length > 0) {
       try {
         playKeySound()

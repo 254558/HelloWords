@@ -17,8 +17,8 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { KEYBOARD_LAYOUT } from '@/constants/keyboardLayout'; // 假设提取到常量文件
+import { ref, watch, onUnmounted } from 'vue';
+import { KEYBOARD_LAYOUT } from '@/constants/keyboardLayout';
 
 const props = defineProps({
   currentWord: {
@@ -27,31 +27,60 @@ const props = defineProps({
   },
   currentIndex: {
     type: Number,
-    default: 0
+    required: true // 如果总是由父组件提供，可以设为required
   }
 });
 
 const keyboardLayout = KEYBOARD_LAYOUT;
 const activeKey = ref('');
 const errorKey = ref('');
+let errorTimeout = null;
 
-const updateActiveKey = () => {
-  const currentWord = props.currentWord;
-  if (currentWord && currentWord.name) {
-    activeKey.value = currentWord.name[props.currentIndex]?.toLowerCase() || '';
-    errorKey.value = '';
-  }
+// 提取当前字母的计算逻辑
+const getCurrentLetter = () => {
+  return props.currentWord?.name?.[props.currentIndex]?.toLowerCase() || '';
 };
 
-watch(() => props.currentWord?.name, updateActiveKey, { immediate: true });
+// 更新激活键
+const updateActiveKey = () => {
+  activeKey.value = getCurrentLetter();
+};
 
-// 提供方法给父组件调用
+// 初始化时设置激活键
+updateActiveKey();
+
+// 监听当前单词变化
+watch(() => props.currentWord?.name, updateActiveKey);
+
+// 监听索引变化
+watch(() => props.currentIndex, () => {
+  activeKey.value = getCurrentLetter();
+  // 只有当索引变化时才重置错误状态，而不是每次更新激活键时都重置
+  errorKey.value = '';
+});
+
+// 标记错误并自动清除
 const markError = (key) => {
   errorKey.value = key.toLowerCase();
-  setTimeout(() => {
+  
+  // 清除之前的定时器
+  if (errorTimeout) {
+    clearTimeout(errorTimeout);
+  }
+  
+  // 设置新的定时器
+  errorTimeout = setTimeout(() => {
     errorKey.value = '';
+    errorTimeout = null;
   }, 500);
 };
+
+// 组件卸载时清除定时器
+onUnmounted(() => {
+  if (errorTimeout) {
+    clearTimeout(errorTimeout);
+  }
+});
 
 defineExpose({ markError });
 </script>
