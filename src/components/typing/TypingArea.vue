@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import { useWordStore } from '../../stores/word'
 import WordCard from '../word/WordCard.vue'
 import { useTyping } from '../../composables/useTyping'
@@ -40,11 +40,7 @@ watch(
   () => store.currentWord,
   (newWord) => {
     if (newWord?.name) {
-      try {
-        speakWord(newWord.name)
-      } catch (error) {
-        errorHandler.handleAudioError(error)
-      }
+      speakWord(newWord.name)
       reset()
       store.typedChars = []
     }
@@ -57,7 +53,7 @@ watch(inputState, (newValue) => {
   store.typedChars = newValue.split('')
 })
 
-// 处理键盘输入
+// 处理键盘输入（优化版）
 const handleKeydown = (event) => {
   if (event.ctrlKey || event.altKey || event.metaKey) return
   
@@ -71,38 +67,39 @@ const handleKeydown = (event) => {
       if (correctChar) {
         handleInput(inputChar)
         
-        if (inputChar === correctChar) {
-          try { playKeySound() } catch (error) { errorHandler.handleAudioError(error) }
-          
-          const chars = wordCardRef.value?.chars
-          if (chars && chars[currentLength]) {
-            jump(chars[currentLength])
-            console.log('正确输入，触发jump动画')
+        // 使用requestAnimationFrame同步视觉和音频
+        requestAnimationFrame(() => {
+          if (inputChar === correctChar) {
+            playKeySound()
+            
+            const chars = wordCardRef.value?.chars
+            if (chars && chars[currentLength]) {
+              jump(chars[currentLength])
+            }
+            
+            if (inputState.value === store.currentWord.name) {
+              setTimeout(() => {
+                reset()
+                store.typedChars = []
+                store.nextWord()
+              }, 300)
+            }
+          } else {
+            playErrorSound()
+            
+            const chars = wordCardRef.value?.chars
+            if (chars && chars[currentLength]) {
+              shake(chars[currentLength])
+            }
+            
+            store.increaseErrors?.()
           }
-          
-          if (inputState.value === store.currentWord.name) {
-            setTimeout(() => {
-              reset()
-              store.typedChars = []
-              store.nextWord()
-            }, 300)
-          }
-        } else {
-          try { playErrorSound() } catch (error) { errorHandler.handleAudioError(error) }
-          
-          const chars = wordCardRef.value?.chars
-          if (chars && chars[currentLength]) {
-            shake(chars[currentLength])
-            console.log('错误输入，触发shake动画')
-          }
-          
-          store.increaseErrors?.()
-        }
+        })
       }
     }
   } else if (event.key === 'Backspace') {
     if (inputState.value.length > 0) {
-      try { playKeySound() } catch (error) { errorHandler.handleAudioError(error) }
+      playKeySound()
       handleBackspace()
       store.typedChars.pop()
     }
@@ -116,9 +113,14 @@ const handleBlur = () => {
   }, 0)
 }
 
-// 组件挂载时自动获取焦点
+// 组件挂载时自动获取焦点并预加载音频
 onMounted(() => {
   areaRef.value?.focus()
+  
+  // 预加载音频（在用户首次交互后）
+  nextTick(() => {
+    playKeySound() // 触发一次播放以初始化音频上下文
+  })
 })
 </script>
 
