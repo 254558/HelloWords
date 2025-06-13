@@ -1,4 +1,4 @@
-// words/src/services/storageService.js
+
 const STORAGE_KEY = 'qwerty-learner-'
 const DEFAULT_EXPIRATION = 7 * 24 * 60 * 60 * 1000 // 7天
 
