@@ -143,10 +143,23 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 
+w-full：宽度设置为父容器的 100%，确保元素填满可用水平空间。
+outline-none：移除元素获得焦点时的默认轮廓线（如输入框被点击时的蓝色边框）。
+flex：将元素转换为 Flexbox 容器，启用弹性布局模型。
+items-center：在垂直方向上居中对齐所有子元素。
+justify-center：在水平方向上居中对齐所有子元素。 
+*/
 .typing-area {
   @apply w-full outline-none flex items-center justify-center;
 }
 
+/* 
+flex：将元素转换为 Flexbox 容器，启用弹性布局模型。
+flex-col：设置 Flex 容器的主轴方向为垂直方向（从上到下排列子元素）。
+items-center：在交叉轴（此时为水平方向）上居中对齐子元素。
+justify-center：在主轴（此时为垂直方向）上居中对齐子元素。 
+*/
 .word-container {
   @apply flex flex-col items-center justify-center;
 }
