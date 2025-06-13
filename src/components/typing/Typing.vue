@@ -1,6 +1,5 @@
 <template>
   <div class="typing-container" @keydown="handleKeydown">
-    <!-- 渲染单词卡片组件，传递当前单词、已输入的字符和当前索引 -->
     <WordCard
       :word="store.currentWord"
       :typedChars="typedResult"
