@@ -11,14 +11,25 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 正确输入动画：跳动效果 */
 @keyframes jump {
-  0% {
+  0%, 100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-10px);
   }
-  100% {
-    transform: translateY(0);
+}
+
+/* 错误输入动画：摇晃效果 */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25%, 75% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
   }
 }

@@ -26,7 +26,6 @@ import { useSound } from '../../composables/useSound'
 import { useAnimation } from '../../composables/useAnimation'
 import { errorHandler } from '../../utils/errorHandler'
 
-// 提取正则表达式为常量
 const VALID_CHAR_REGEX = /^[a-zA-Z\-']$/
 
 const store = useWordStore()
@@ -46,8 +45,6 @@ watch(
       } catch (error) {
         errorHandler.handleAudioError(error)
       }
-      
-      // 重置输入状态
       reset()
       store.typedChars = []
     }
@@ -57,20 +54,17 @@ watch(
 
 // 监听输入状态变化，同步到 store
 watch(inputState, (newValue) => {
-  // 确保 store.typedChars 与 inputState 同步
   store.typedChars = newValue.split('')
 })
 
 // 处理键盘输入
 const handleKeydown = (event) => {
-  // 忽略修饰键组合
   if (event.ctrlKey || event.altKey || event.metaKey) return
   
   const currentLength = inputState.value.length
   const correctChar = store.currentWord.name[currentLength]?.toLowerCase()
   
   if (event.key.length === 1) {
-    // 处理字母输入
     if (VALID_CHAR_REGEX.test(event.key)) {
       const inputChar = event.key.toLowerCase()
       
@@ -78,20 +72,15 @@ const handleKeydown = (event) => {
         handleInput(inputChar)
         
         if (inputChar === correctChar) {
-          // 正确输入
-          try {
-            playKeySound()
-          } catch (error) {
-            errorHandler.handleAudioError(error)
-          }
+          try { playKeySound() } catch (error) { errorHandler.handleAudioError(error) }
           
           const chars = wordCardRef.value?.chars
           if (chars && chars[currentLength]) {
             jump(chars[currentLength])
+            console.log('正确输入，触发jump动画')
           }
           
           if (inputState.value === store.currentWord.name) {
-            // 完成单词
             setTimeout(() => {
               reset()
               store.typedChars = []
@@ -99,16 +88,12 @@ const handleKeydown = (event) => {
             }, 300)
           }
         } else {
-          // 错误输入
-          try {
-            playErrorSound()
-          } catch (error) {
-            errorHandler.handleAudioError(error)
-          }
+          try { playErrorSound() } catch (error) { errorHandler.handleAudioError(error) }
           
           const chars = wordCardRef.value?.chars
           if (chars && chars[currentLength]) {
             shake(chars[currentLength])
+            console.log('错误输入，触发shake动画')
           }
           
           store.increaseErrors?.()
@@ -116,20 +101,15 @@ const handleKeydown = (event) => {
       }
     }
   } else if (event.key === 'Backspace') {
-    // 处理退格键
     if (inputState.value.length > 0) {
-      try {
-        playKeySound()
-      } catch (error) {
-        errorHandler.handleAudioError(error)
-      }
+      try { playKeySound() } catch (error) { errorHandler.handleAudioError(error) }
       handleBackspace()
       store.typedChars.pop()
     }
   }
 }
 
-// 处理失去焦点的情况
+// 处理失去焦点
 const handleBlur = () => {
   setTimeout(() => {
     areaRef.value?.focus()
@@ -143,23 +123,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 
-w-full：宽度设置为父容器的 100%，确保元素填满可用水平空间。
-outline-none：移除元素获得焦点时的默认轮廓线（如输入框被点击时的蓝色边框）。
-flex：将元素转换为 Flexbox 容器，启用弹性布局模型。
-items-center：在垂直方向上居中对齐所有子元素。
-justify-center：在水平方向上居中对齐所有子元素。 
-*/
 .typing-area {
   @apply w-full outline-none flex items-center justify-center;
 }
-
-/* 
-flex：将元素转换为 Flexbox 容器，启用弹性布局模型。
-flex-col：设置 Flex 容器的主轴方向为垂直方向（从上到下排列子元素）。
-items-center：在交叉轴（此时为水平方向）上居中对齐子元素。
-justify-center：在主轴（此时为垂直方向）上居中对齐子元素。 
-*/
 .word-container {
   @apply flex flex-col items-center justify-center;
 }

@@ -7,9 +7,10 @@ export function useAnimation() {
     if (!element || animatingElements.value.has(element)) return
     
     animatingElements.value.add(element)
+    element.style.display = 'inline-block' // 确保元素支持transform
     
     element.style.animation = 'none'
-    element.offsetHeight // trigger reflow
+    element.offsetHeight // 触发重排
     element.style.animation = `${animationName} ${duration}ms ease`
     
     setTimeout(() => {
