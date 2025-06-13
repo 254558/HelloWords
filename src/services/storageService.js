@@ -1,3 +1,4 @@
+// words/src/services/storageService.js
 const STORAGE_KEY = 'qwerty-learner-'
 const DEFAULT_EXPIRATION = 7 * 24 * 60 * 60 * 1000 // 7天
 
@@ -10,24 +11,24 @@ export const storageService = {
       expiration
     }))
   },
-  
+
   getProgress() {
     const data = localStorage.getItem(STORAGE_KEY + 'progress')
     if (!data) return null
-    
+
     try {
       const parsed = JSON.parse(data)
-      
+
       // 验证数据结构
-      if (!Array.isArray(parsed.wordList) || 
-          typeof parsed.currentIndex !== 'number' ||
-          isNaN(parsed.currentIndex) ||
-          !parsed.timestamp) {
+      if (!Array.isArray(parsed.wordList) ||
+        typeof parsed.currentIndex !== 'number' ||
+        isNaN(parsed.currentIndex) ||
+        !parsed.timestamp) {
         console.warn('Invalid progress data format')
         this.clearProgress()
         return null
       }
-      
+
       // 检查过期
       const expiration = parsed.expiration || DEFAULT_EXPIRATION
       if (Date.now() - parsed.timestamp > expiration) {
@@ -35,7 +36,7 @@ export const storageService = {
         this.clearProgress()
         return null
       }
-      
+
       return parsed
     } catch (error) {
       console.error('Failed to parse progress data:', error)
@@ -47,12 +48,12 @@ export const storageService = {
   clearProgress() {
     localStorage.removeItem(STORAGE_KEY + 'progress')
   },
-  
+
   // 可选增强方法
   getAllData() {
     const keys = Object.keys(localStorage)
-      .filter(key => key.startsWith(STORAGE_KEY))
-      
+     .filter(key => key.startsWith(STORAGE_KEY))
+
     return keys.reduce((result, key) => {
       try {
         result[key] = JSON.parse(localStorage.getItem(key))
@@ -62,11 +63,11 @@ export const storageService = {
       return result
     }, {})
   },
-  
+
   clearAll() {
     const keys = Object.keys(localStorage)
-      .filter(key => key.startsWith(STORAGE_KEY))
-      
+     .filter(key => key.startsWith(STORAGE_KEY))
+
     keys.forEach(key => localStorage.removeItem(key))
   }
 }
