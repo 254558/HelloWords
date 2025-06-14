@@ -1,5 +1,5 @@
 <template>
-  <div class="progress-bar mb-8 mt-20"> 
+  <div class="progress-bar mb-0 mt-20"> 
     <div class="progress-bg">
       <div 
         class="progress-fill"

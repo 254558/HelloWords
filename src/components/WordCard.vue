@@ -81,7 +81,7 @@ defineExpose({ chars, handleSpeak })
   padding-top: 5rem;
 }
 .word {
-  @apply text-[120px] font-mono tracking-wider text-white cursor-pointer select-none hover:opacity-80 transition-opacity leading-none mb-12;
+  @apply text-[110px] font-mono tracking-wider text-white cursor-pointer select-none hover:opacity-80 transition-opacity leading-none mb-12;
 }
 .word span {
   @apply inline-block;
