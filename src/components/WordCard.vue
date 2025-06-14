@@ -25,8 +25,8 @@
 
 <script setup>
 import { ref, onMounted, computed, nextTick } from 'vue'
-import { useSound } from '../../composables/useSound'
-import { useAnimation } from '../../composables/useAnimation'
+import { useSound } from '../composables/useSound'
+import { useAnimation } from '../composables/useAnimation'
 
 const { speakWord } = useSound()
 const { jump, shake } = useAnimation()

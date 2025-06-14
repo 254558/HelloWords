@@ -19,12 +19,12 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useWordStore } from '../../stores/word'
-import WordCard from '../word/WordCard.vue'
-import { useTyping } from '../../composables/useTyping'
-import { useSound } from '../../composables/useSound'
-import { useAnimation } from '../../composables/useAnimation'
-import { errorHandler } from '../../utils/errorHandler'
+import { useWordStore } from '../stores/word'
+import WordCard from './WordCard.vue'
+import { useTyping } from '../composables/useTyping'
+import { useSound } from '../composables/useSound'
+import { useAnimation } from '../composables/useAnimation'
+import { errorHandler } from '../utils/errorHandler'
 
 const VALID_CHAR_REGEX = /^[a-zA-Z\-']$/
 
