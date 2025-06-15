@@ -72,12 +72,17 @@ const handleKeydown = (event) => {
         handleInput(inputChar)
         
         if (inputChar === correctChar) {
-          try { playKeySound() } catch (error) { errorHandler.handleAudioError(error) }
-          
+          setTimeout(() => {
+            try { 
+              playKeySound() 
+            } catch (error) {
+              errorHandler.handleAudioError(error) 
+            }
+          }, 0)
+
           const chars = wordCardRef.value?.chars
           if (chars && chars[currentLength]) {
             jump(chars[currentLength])
-            console.log('正确输入，触发jump动画')
           }
           
           if (inputState.value === store.currentWord.name) {
@@ -88,12 +93,17 @@ const handleKeydown = (event) => {
             }, 300)
           }
         } else {
-          try { playErrorSound() } catch (error) { errorHandler.handleAudioError(error) }
-          
+          setTimeout(() => {
+            try { 
+              playErrorSound() 
+            } catch (error) {
+              errorHandler.handleAudioError(error) 
+            }
+          }, 0)
+
           const chars = wordCardRef.value?.chars
           if (chars && chars[currentLength]) {
             shake(chars[currentLength])
-            console.log('错误输入，触发shake动画')
           }
           
           store.increaseErrors?.()
@@ -102,7 +112,14 @@ const handleKeydown = (event) => {
     }
   } else if (event.key === 'Backspace') {
     if (inputState.value.length > 0) {
-      try { playKeySound() } catch (error) { errorHandler.handleAudioError(error) }
+      setTimeout(() => {
+        try { 
+          playKeySound() 
+        } catch (error) {
+          errorHandler.handleAudioError(error) 
+        }
+      }, 0)
+
       handleBackspace()
       store.typedChars.pop()
     }

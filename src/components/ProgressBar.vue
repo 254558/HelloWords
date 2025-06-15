@@ -15,11 +15,10 @@
 
 <script setup>
 import { useWordStore } from '../stores/word'
+import { toRefs } from 'vue'
 
 const store = useWordStore()
-const progress = store.progress
-const currentIndex = store.currentIndex
-const totalWords = store.totalWords
+const { progress, currentIndex, totalWords } = toRefs(store)
 </script>
 
 <style scoped>
