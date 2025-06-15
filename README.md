@@ -1,6 +1,6 @@
 ### 雅思单词网站在线预览
 ![alt text](image-1.png)
-https://hi-five-blond.vercel.app （需VPN）
+https://hellowords.vercel.app（需VPN）
 
 ### 技术栈与依赖
 - **前端框架**：Vue.js 3
